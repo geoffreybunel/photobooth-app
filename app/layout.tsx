@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fredoka, Space_Mono, Work_Sans } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/src/components/navigation/Navbar";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -37,7 +38,14 @@ export default function RootLayout({
       className={`${fredoka.variable} ${spaceMono.variable} ${workSans.variable}`}
     >
       <body className="font-sans bg-base-100 text-base-content min-h-screen">
-        {children}
+        <div className="max-w-275 mx-auto pt-8 px-6 pb-20">
+          <Navbar />
+          <div className="flex flex-col flex-1 items-center justify-center">
+            {children}
+          </div>
+        </div>
+
+
       </body>
     </html>
   );

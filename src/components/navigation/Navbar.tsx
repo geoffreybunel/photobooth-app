@@ -2,24 +2,21 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <nav className="w-full bg-white dark:bg-zinc-900 shadow-md">
-      <ul className="flex justify-center gap-8 py-4">
-        <li>
-          <Link href="/" className="text-zinc-800 dark:text-zinc-200 hover:underline">
-            Home
-          </Link>
-        </li>
-        <li>
-          <Link href="/About" className="text-zinc-800 dark:text-zinc-200 hover:underline">
-            About
-          </Link>
-        </li>
-        <li>
-          <Link href="/Contact" className="text-zinc-800 dark:text-zinc-200 hover:underline">
-            Contact
-          </Link>
-        </li>
-      </ul>
+    <nav className="mb-14 flex">
+        <div className="flex-1 flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_0_4px_hsl(var(--color-primary)/0.25)]" />
+            <Link href="/" className="font-display font-bold text-2xl tracking-tight">
+                Joysnap
+            </Link>
+        </div>
+        <div className="flex gap-10 text-primary-content font-mono font-bold text-sm uppercase tracking-wide">
+            <Link href="/About">
+                About
+            </Link>
+            <Link href="/Contact">
+                Contact
+            </Link>
+        </div>
     </nav>
   );
 }

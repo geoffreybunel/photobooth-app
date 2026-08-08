@@ -1,21 +1,21 @@
 const FRAMES = [
   {
-    name: "Soleil couchant",
+    name: "Filtre 1",
     desc: "Bordure chaude",
     gradient: "linear-gradient(150deg, hsl(var(--color-secondary)), hsl(var(--color-primary)))",
   },
   {
-    name: "Nuit sarcelle",
+    name: "Filtre 2",
     desc: "Contraste frais",
     gradient: "linear-gradient(150deg, hsl(var(--color-accent)), hsl(315 32% 30%))",
   },
   {
-    name: "Studio prune",
+    name: "Filtre 3",
     desc: "Classique vintage",
     gradient: "linear-gradient(150deg, hsl(var(--color-primary)), hsl(var(--color-neutral)))",
   },
   {
-    name: "Doré léger",
+    name: "Filtre 4",
     desc: "Minimal festif",
     gradient: "linear-gradient(150deg, hsl(var(--color-neutral)), hsl(var(--color-secondary)))",
   },
@@ -29,22 +29,7 @@ const STRIP_COLORS = [
 
 export default function Home() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
-      {/* NAVBAR */}
-      <div className="navbar px-0 mb-14">
-        <div className="flex-1 flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_0_4px_hsl(var(--color-primary)/0.25)]" />
-          <span className="font-display font-bold text-lg tracking-tight">
-            photobooth-app
-          </span>
-        </div>
-        <div className="flex-none">
-          <span className="badge border-none bg-neutral text-neutral-content font-mono text-[11px] uppercase tracking-wide">
-            V1 · Solo
-          </span>
-        </div>
-      </div>
-
+    <div className="w-full">
       {/* HERO */}
       <div className="grid md:grid-cols-2 gap-14 items-center mb-24">
         <div>
@@ -56,7 +41,12 @@ export default function Home() {
           <h1 className="font-display font-bold text-4xl md:text-5xl leading-tight mb-5">
             Prends la pose,
             <br />
-            c&apos;est <span className="text-primary">parti</span> !
+            <span className="relative inline-block">
+              c&apos;est <span className="text-primary">parti</span>
+              <svg viewBox="0 0 220 14" preserveAspectRatio="none">
+                <path d="M2 10 C 40 2, 180 2, 218 10" stroke="#FFC145" stroke-width="6" fill="none" stroke-linecap="round"></path>
+              </svg>
+            </span>
           </h1>
 
           <p className="text-base leading-relaxed mb-8 max-w-md text-base-content/70">
@@ -88,7 +78,7 @@ export default function Home() {
                 4
               </div>
               <div className="stat-desc font-mono uppercase text-[10px] tracking-wider">
-                Cadres au choix
+                Filtres au choix
               </div>
             </div>
             <div className="stat py-3 px-6">
@@ -117,7 +107,7 @@ export default function Home() {
               </div>
 
               <div
-                className="rounded-2xl aspect-[4/5] flex items-center justify-center mb-4"
+                className="rounded-2xl aspect-4/5 flex items-center justify-center mb-4"
                 style={{
                   background:
                     "linear-gradient(160deg, hsl(315 30% 32%), hsl(315 40% 18%))",
@@ -164,7 +154,7 @@ export default function Home() {
 
       {/* CADRES DISPONIBLES */}
       <p className="font-mono text-xs tracking-widest uppercase mb-5 flex items-center gap-3 text-primary">
-        Cadres disponibles
+        Filtres disponibles
         <span
           className="flex-1 h-0.5"
           style={{
@@ -182,7 +172,7 @@ export default function Home() {
           >
             <div className="card-body p-4">
               <div
-                className="aspect-[3/4] rounded-xl mb-3"
+                className="aspect-3/4 rounded-xl mb-3"
                 style={{ background: frame.gradient }}
               />
               <p className="font-display font-semibold text-sm">
