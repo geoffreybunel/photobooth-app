@@ -35,14 +35,14 @@ export default function Home() {
         <div>
           <p className="font-mono text-xs tracking-widest uppercase mb-3 flex items-center gap-2 text-primary">
             <span className="w-4 h-0.5 inline-block bg-primary" />
-            Aucune borne, aucun compte
+            No account needed
           </p>
 
           <h1 className="font-display font-bold text-4xl md:text-5xl leading-tight mb-5">
-            Prends la pose,
+          Strike a pose,
             <br />
             <span className="relative inline-block">
-              c&apos;est <span className="text-primary">parti</span>
+              it&apos;s <span className="text-primary">time</span>
               <svg viewBox="0 0 220 14" preserveAspectRatio="none">
                 <path d="M2 10 C 40 2, 180 2, 218 10" stroke="#FFC145" stroke-width="6" fill="none" stroke-linecap="round"></path>
               </svg>
@@ -50,13 +50,12 @@ export default function Home() {
           </h1>
 
           <p className="text-base leading-relaxed mb-8 max-w-md text-base-content/70">
-            Ouvre la caméra, laisse le compte à rebours faire son effet, et
-            repars avec ta bande photo — direct sur ton téléphone.
+            Open the photobooth, let the countdown do its magic, and leave with your photo strip.
           </p>
 
           <div className="flex items-center gap-4 mb-10">
             <button className="btn btn-primary border-none font-display font-semibold text-base rounded-full shadow-[0_6px_0_hsl(8_70%_52%)]">
-              📸 Ouvrir le photobooth
+              📸 Open the photobooth
             </button>
             <span className="font-mono text-xs text-base-content/55">
               3 photos · 12 sec
@@ -67,10 +66,10 @@ export default function Home() {
           <div className="stats stats-vertical sm:stats-horizontal shadow-none bg-transparent border-t-2 border-dashed border-base-content/15">
             <div className="stat py-3 px-0 pr-6">
               <div className="stat-value font-display font-bold text-2xl">
-                0€
+                FREE
               </div>
               <div className="stat-desc font-mono uppercase text-[10px] tracking-wider">
-                Sans compte
+                No accout needed
               </div>
             </div>
             <div className="stat py-3 px-6">
@@ -78,7 +77,7 @@ export default function Home() {
                 4
               </div>
               <div className="stat-desc font-mono uppercase text-[10px] tracking-wider">
-                Filtres au choix
+                Filters available
               </div>
             </div>
             <div className="stat py-3 px-6">
@@ -86,7 +85,7 @@ export default function Home() {
                 HD
               </div>
               <div className="stat-desc font-mono uppercase text-[10px] tracking-wider">
-                Export qualité
+                High-quality export
               </div>
             </div>
           </div>
@@ -99,7 +98,7 @@ export default function Home() {
               <div className="flex justify-between items-center mb-3">
                 <span className="font-mono text-[11px] flex items-center gap-2 text-primary">
                   <span className="w-2 h-2 rounded-full bg-primary" />
-                  PRÊT
+                  READY
                 </span>
                 <span className="font-mono text-[11px] text-neutral-content/50">
                   02 / 03
@@ -129,7 +128,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Bande photo qui dépasse */}
+          {/* Photo strip */}
           <div
             className="absolute -right-4 top-1 rounded-md shadow-xl p-2.5 pb-4 bg-[#FFFDF8]"
             style={{ width: "104px", transform: "rotate(8deg)" }}
@@ -154,7 +153,7 @@ export default function Home() {
 
       {/* CADRES DISPONIBLES */}
       <p className="font-mono text-xs tracking-widest uppercase mb-5 flex items-center gap-3 text-primary">
-        Filtres disponibles
+        Available filters
         <span
           className="flex-1 h-0.5"
           style={{

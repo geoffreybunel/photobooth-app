@@ -25,7 +25,9 @@
 
 body {
   background: var(--cream);
-  background-image: radial-gradient(circle at 8% 15%, rgba(255, 193, 69, 0.35) 0%, transparent 40%), radial-gradient(circle at 92% 80%, rgba(46, 196, 182, 0.25) 0%, transparent 40%);
+  background-image: 
+    radial-gradient(circle at 8% 15%, rgba(255, 193, 69, 0.35) 0%, transparent 40%), 
+    radial-gradient(circle at 92% 80%, rgba(46, 196, 182, 0.25) 0%, transparent 40%);
   color: var(--plum);
   font-family: 'Work Sans', sans-serif;
   min-height: 100vh;
