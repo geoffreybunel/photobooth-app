@@ -1,8 +1,200 @@
+const FRAMES = [
+  {
+    name: "Soleil couchant",
+    desc: "Bordure chaude",
+    gradient: "linear-gradient(150deg, hsl(var(--color-secondary)), hsl(var(--color-primary)))",
+  },
+  {
+    name: "Nuit sarcelle",
+    desc: "Contraste frais",
+    gradient: "linear-gradient(150deg, hsl(var(--color-accent)), hsl(315 32% 30%))",
+  },
+  {
+    name: "Studio prune",
+    desc: "Classique vintage",
+    gradient: "linear-gradient(150deg, hsl(var(--color-primary)), hsl(var(--color-neutral)))",
+  },
+  {
+    name: "Doré léger",
+    desc: "Minimal festif",
+    gradient: "linear-gradient(150deg, hsl(var(--color-neutral)), hsl(var(--color-secondary)))",
+  },
+];
+
+const STRIP_COLORS = [
+  "linear-gradient(135deg, hsl(var(--color-accent)), hsl(172 60% 32%))",
+  "linear-gradient(135deg, hsl(var(--color-primary)), hsl(8 70% 48%))",
+  "linear-gradient(135deg, hsl(var(--color-secondary)), hsl(40 80% 45%))",
+];
+
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-      </main>
+    <div className="max-w-5xl mx-auto px-6 py-10">
+      {/* NAVBAR */}
+      <div className="navbar px-0 mb-14">
+        <div className="flex-1 flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_0_4px_hsl(var(--color-primary)/0.25)]" />
+          <span className="font-display font-bold text-lg tracking-tight">
+            photobooth-app
+          </span>
+        </div>
+        <div className="flex-none">
+          <span className="badge border-none bg-neutral text-neutral-content font-mono text-[11px] uppercase tracking-wide">
+            V1 · Solo
+          </span>
+        </div>
+      </div>
+
+      {/* HERO */}
+      <div className="grid md:grid-cols-2 gap-14 items-center mb-24">
+        <div>
+          <p className="font-mono text-xs tracking-widest uppercase mb-3 flex items-center gap-2 text-primary">
+            <span className="w-4 h-0.5 inline-block bg-primary" />
+            Aucune borne, aucun compte
+          </p>
+
+          <h1 className="font-display font-bold text-4xl md:text-5xl leading-tight mb-5">
+            Prends la pose,
+            <br />
+            c&apos;est <span className="text-primary">parti</span> !
+          </h1>
+
+          <p className="text-base leading-relaxed mb-8 max-w-md text-base-content/70">
+            Ouvre la caméra, laisse le compte à rebours faire son effet, et
+            repars avec ta bande photo — direct sur ton téléphone.
+          </p>
+
+          <div className="flex items-center gap-4 mb-10">
+            <button className="btn btn-primary border-none font-display font-semibold text-base rounded-full shadow-[0_6px_0_hsl(8_70%_52%)]">
+              📸 Ouvrir le photobooth
+            </button>
+            <span className="font-mono text-xs text-base-content/55">
+              3 photos · 12 sec
+            </span>
+          </div>
+
+          {/* STATS */}
+          <div className="stats stats-vertical sm:stats-horizontal shadow-none bg-transparent border-t-2 border-dashed border-base-content/15">
+            <div className="stat py-3 px-0 pr-6">
+              <div className="stat-value font-display font-bold text-2xl">
+                0€
+              </div>
+              <div className="stat-desc font-mono uppercase text-[10px] tracking-wider">
+                Sans compte
+              </div>
+            </div>
+            <div className="stat py-3 px-6">
+              <div className="stat-value font-display font-bold text-2xl">
+                4
+              </div>
+              <div className="stat-desc font-mono uppercase text-[10px] tracking-wider">
+                Cadres au choix
+              </div>
+            </div>
+            <div className="stat py-3 px-6">
+              <div className="stat-value font-display font-bold text-2xl">
+                HD
+              </div>
+              <div className="stat-desc font-mono uppercase text-[10px] tracking-wider">
+                Export qualité
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CAMERA / STRIP */}
+        <div className="relative flex justify-center">
+          <div className="card w-72 bg-neutral rounded-3xl shadow-xl">
+            <div className="card-body p-5">
+              <div className="flex justify-between items-center mb-3">
+                <span className="font-mono text-[11px] flex items-center gap-2 text-primary">
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                  PRÊT
+                </span>
+                <span className="font-mono text-[11px] text-neutral-content/50">
+                  02 / 03
+                </span>
+              </div>
+
+              <div
+                className="rounded-2xl aspect-[4/5] flex items-center justify-center mb-4"
+                style={{
+                  background:
+                    "linear-gradient(160deg, hsl(315 30% 32%), hsl(315 40% 18%))",
+                }}
+              >
+                <span
+                  className="font-display font-bold text-7xl text-secondary"
+                  style={{ textShadow: "0 6px 0 rgba(0,0,0,0.15)" }}
+                >
+                  3
+                </span>
+              </div>
+
+              <div className="flex justify-center items-center gap-4">
+                <span className="w-2.5 h-2.5 rounded-full bg-neutral-content/20" />
+                <div className="w-14 h-14 rounded-full bg-secondary border-4 border-neutral-content/85 shadow-[0_4px_0_hsl(40_80%_45%)]" />
+                <span className="w-2.5 h-2.5 rounded-full bg-neutral-content/20" />
+              </div>
+            </div>
+          </div>
+
+          {/* Bande photo qui dépasse */}
+          <div
+            className="absolute -right-4 top-1 rounded-md shadow-xl p-2.5 pb-4 bg-[#FFFDF8]"
+            style={{ width: "104px", transform: "rotate(8deg)" }}
+          >
+            <div
+              className="absolute -top-2.5 left-1/2 w-11 h-5 rounded-sm bg-secondary/85"
+              style={{ transform: "translateX(-50%) rotate(-4deg)" }}
+            />
+            {STRIP_COLORS.map((gradient, i) => (
+              <div
+                key={i}
+                className="aspect-square rounded-[3px] mb-2"
+                style={{ background: gradient }}
+              />
+            ))}
+            <p className="font-mono text-center text-[9px] text-base-content/55">
+              04.08.26
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* CADRES DISPONIBLES */}
+      <p className="font-mono text-xs tracking-widest uppercase mb-5 flex items-center gap-3 text-primary">
+        Cadres disponibles
+        <span
+          className="flex-1 h-0.5"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(90deg, hsl(var(--color-base-content)/0.25) 0, hsl(var(--color-base-content)/0.25) 6px, transparent 6px, transparent 12px)",
+          }}
+        />
+      </p>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+        {FRAMES.map((frame) => (
+          <div
+            key={frame.name}
+            className="card bg-[#FFFDF8] rounded-2xl shadow-md hover:-translate-y-1.5 transition-transform"
+          >
+            <div className="card-body p-4">
+              <div
+                className="aspect-[3/4] rounded-xl mb-3"
+                style={{ background: frame.gradient }}
+              />
+              <p className="font-display font-semibold text-sm">
+                {frame.name}
+              </p>
+              <p className="font-mono text-[10px] uppercase mt-1 text-base-content/55">
+                {frame.desc}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
