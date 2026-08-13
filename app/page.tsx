@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const FRAMES = [
   {
     name: "Filtre 1",
@@ -54,9 +56,9 @@ export default function Home() {
           </p>
 
           <div className="flex items-center gap-4 mb-10">
-            <button className="bg-primary border-none font-display font-semibold text-bas text-white rounded-full shadow-[0_6px_0_hsl(8_70%_52%)] py-4 px-7.5 transition-transform duration-150 ease-in-out hover:-translate-y-1">
+            <Link href="/Booth" className="bg-primary border-none font-display font-semibold text-bas text-white rounded-full shadow-[0_6px_0_hsl(8_70%_52%)] py-4 px-7.5 transition-transform duration-150 ease-in-out hover:-translate-y-1">
               📸 Open the photobooth
-            </button>
+            </Link>
             <span className="font-mono text-xs text-base-content/55">
               3 photos · 12 sec
             </span>
