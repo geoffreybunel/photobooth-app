@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState } from "react";
 
 export default function Booth() {
@@ -82,7 +83,12 @@ export default function Booth() {
       {/* Display Photo */}
       {photo && (
         <div className="flex flex-col items-center gap-4">
-          <img src={photo} alt="Captured" className="rounded-lg shadow-md max-w-xs"/>
+          <Image
+              src={photo}
+              alt="Captured"
+              fill
+              className="rounded-lg shadow-md object-cover"
+            />
           <div className="flex gap-4">
             <a
               href={photo}
