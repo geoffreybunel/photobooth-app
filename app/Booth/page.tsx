@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 const TOTAL_SHOTS = 4;
-const CAPTURE_INTERVAL_MS = 3000;
+const COUNTDOWN_SECONDS = 3;
 const STRIP_PADDING = 20;
 const PHOTO_GAP = 16;
 
@@ -49,6 +49,8 @@ export default function Booth() {
   const streamRef = useRef<MediaStream | null>(null);
   const [photos, setPhotos] = useState<string[]>([]);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [flash, setFlash] = useState(false);
   const [stripUrl, setStripUrl] = useState<string | null>(null);
 
   // Start the camera
@@ -93,13 +95,19 @@ export default function Booth() {
     setIsCapturing(true);
 
     for (let shot = 0; shot < TOTAL_SHOTS; shot++) {
-      if (shot > 0) {
-        await new Promise((resolve) => setTimeout(resolve, CAPTURE_INTERVAL_MS));
+      for (let s = COUNTDOWN_SECONDS; s > 0; s--) {
+        setCountdown(s);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
+      setCountdown(null);
+
+      setFlash(true);
       const dataUrl = takeSnapshot();
       if (dataUrl) {
         setPhotos((prev) => [...prev, dataUrl]);
       }
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      setFlash(false);
     }
 
     setIsCapturing(false);
@@ -148,15 +156,19 @@ export default function Booth() {
           >
             Start Camera
           </button>
+          <div
+            className={`absolute inset-0 rounded-lg bg-white pointer-events-none transition-opacity duration-150 ${
+              flash ? "opacity-90" : "opacity-0"
+            }`}
+          />
         </div>
       )}
 
       {/* Capture Button */}
-      {!sessionComplete && (
+      {!sessionComplete && !isCapturing && (
         <button
           onClick={startPhotoSession}
-          disabled={isCapturing}
-          className="bg-secondary text-white px-6 py-3 rounded-full shadow-md hover:scale-105 transition-transform disabled:opacity-60 disabled:hover:scale-100"
+          className="bg-secondary text-white px-6 py-3 rounded-full shadow-md hover:scale-105 transition-transform"
         >
           📸 Take {TOTAL_SHOTS} Photos
         </button>
@@ -165,9 +177,17 @@ export default function Booth() {
       {/* Capture Progress */}
       {isCapturing && (
         <div className="flex flex-col items-center gap-2">
-          <span className="h-8 w-8 rounded-full border-4 border-secondary/30 border-t-secondary animate-spin" />
-          <span className="font-mono text-sm text-neutral-content/70">
-            Taking photo {photos.length + 1}/{TOTAL_SHOTS}...
+          {countdown !== null ? (
+            <span className="font-display text-6xl font-bold text-secondary">
+              {countdown}
+            </span>
+          ) : (
+            <span className="loading loading-spinner loading-lg text-primary-content" />
+          )}
+          <span className="font-mono text-sm text-primary-content">
+            {countdown !== null
+              ? `Get ready! Photo ${photos.length + 1}/${TOTAL_SHOTS}`
+              : `Taking photo ${photos.length + 1}/${TOTAL_SHOTS}...`}
           </span>
         </div>
       )}
