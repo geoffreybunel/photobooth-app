@@ -8,6 +8,50 @@ const COUNTDOWN_SECONDS = 3;
 const STRIP_PADDING = 20;
 const PHOTO_GAP = 16;
 
+type PhotoFilter = { id: string; label: string; css: string };
+
+const FILTERS: PhotoFilter[] = [
+  { id: "original", label: "Original", css: "none" },
+  { id: "bw", label: "Black & White", css: "grayscale(1) contrast(1.1)" },
+  { id: "sepia", label: "Sepia", css: "sepia(0.8) contrast(1.05)" },
+  {
+    id: "vintage",
+    label: "Vintage",
+    css: "grayscale(1) contrast(1.35) brightness(1.05)",
+  },
+];
+
+const GRAIN_INTENSITY = 18;
+
+// Film-grain noise, added pixel-by-pixel like an old strip photo
+function applyFilmGrain(context: CanvasRenderingContext2D, width: number, height: number) {
+  const imageData = context.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const noise = (Math.random() - 0.5) * GRAIN_INTENSITY;
+    data[i] += noise;
+    data[i + 1] += noise;
+    data[i + 2] += noise;
+  }
+  context.putImageData(imageData, 0, 0);
+}
+
+// Darkened corners, like the lens falloff on a real photobooth camera
+function applyVignette(context: CanvasRenderingContext2D, width: number, height: number) {
+  const gradient = context.createRadialGradient(
+    width / 2,
+    height / 2,
+    width * 0.3,
+    width / 2,
+    height / 2,
+    width * 0.75
+  );
+  gradient.addColorStop(0, "rgba(0,0,0,0)");
+  gradient.addColorStop(1, "rgba(0,0,0,0.45)");
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, width, height);
+}
+
 async function composeStrip(shots: string[]): Promise<string> {
   const images = await Promise.all(
     shots.map(
@@ -52,6 +96,7 @@ export default function Booth() {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [flash, setFlash] = useState(false);
   const [stripUrl, setStripUrl] = useState<string | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<PhotoFilter>(FILTERS[0]);
 
   // Start the camera
   const startCamera = async () => {
@@ -84,7 +129,15 @@ export default function Booth() {
     if (!context) return null;
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
+    context.filter = selectedFilter.css;
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+
+    if (selectedFilter.id === "vintage") {
+      context.filter = "none";
+      applyFilmGrain(context, canvas.width, canvas.height);
+      applyVignette(context, canvas.width, canvas.height);
+    }
+
     return canvas.toDataURL("image/png");
   };
 
@@ -147,6 +200,7 @@ export default function Booth() {
           <video
             ref={videoRef}
             className="rounded-lg shadow-md"
+            style={{ filter: selectedFilter.css }}
             autoPlay
             playsInline
           />
@@ -161,6 +215,33 @@ export default function Booth() {
               flash ? "opacity-90" : "opacity-0"
             }`}
           />
+          {selectedFilter.id === "vintage" && (
+            <div
+              className="absolute inset-0 rounded-lg pointer-events-none"
+              style={{
+                boxShadow: "inset 0 0 60px 20px rgba(0,0,0,0.45)",
+              }}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Filter Picker */}
+      {!sessionComplete && !isCapturing && (
+        <div className="flex gap-2 flex-wrap justify-center">
+          {FILTERS.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setSelectedFilter(f)}
+              className={`px-3 py-1.5 rounded-full text-sm font-mono shadow-md transition-colors ${
+                selectedFilter.id === f.id
+                  ? "bg-secondary text-white"
+                  : "bg-white text-neutral-content hover:bg-neutral-100"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
         </div>
       )}
 
