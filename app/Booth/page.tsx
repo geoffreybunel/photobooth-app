@@ -1,104 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { usePhotoSession } from "@/src/hooks/usePhotoSession";
+import { captureFrame, composeStrip, FILTERS, type PhotoFilter } from "@/src/lib/photobooth";
 
 const TOTAL_SHOTS = 4;
 const COUNTDOWN_SECONDS = 3;
-const STRIP_PADDING = 20;
-const PHOTO_GAP = 16;
-
-type PhotoFilter = { id: string; label: string; css: string };
-
-const FILTERS: PhotoFilter[] = [
-  { id: "original", label: "Original", css: "none" },
-  { id: "bw", label: "Black & White", css: "grayscale(1) contrast(1.1)" },
-  { id: "sepia", label: "Sepia", css: "sepia(0.8) contrast(1.05)" },
-  {
-    id: "vintage",
-    label: "Vintage",
-    css: "grayscale(1) contrast(1.35) brightness(1.05)",
-  },
-];
-
-const GRAIN_INTENSITY = 18;
-
-// Film-grain noise, added pixel-by-pixel like an old strip photo
-function applyFilmGrain(context: CanvasRenderingContext2D, width: number, height: number) {
-  const imageData = context.getImageData(0, 0, width, height);
-  const data = imageData.data;
-  for (let i = 0; i < data.length; i += 4) {
-    const noise = (Math.random() - 0.5) * GRAIN_INTENSITY;
-    data[i] += noise;
-    data[i + 1] += noise;
-    data[i + 2] += noise;
-  }
-  context.putImageData(imageData, 0, 0);
-}
-
-// Darkened corners, like the lens falloff on a real photobooth camera
-function applyVignette(context: CanvasRenderingContext2D, width: number, height: number) {
-  const gradient = context.createRadialGradient(
-    width / 2,
-    height / 2,
-    width * 0.3,
-    width / 2,
-    height / 2,
-    width * 0.75
-  );
-  gradient.addColorStop(0, "rgba(0,0,0,0)");
-  gradient.addColorStop(1, "rgba(0,0,0,0.45)");
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, width, height);
-}
-
-async function composeStrip(shots: string[]): Promise<string> {
-  const images = await Promise.all(
-    shots.map(
-      (src) =>
-        new Promise<HTMLImageElement>((resolve, reject) => {
-          const img = new window.Image();
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-          img.src = src;
-        })
-    )
-  );
-
-  const photoWidth = Math.min(...images.map((img) => img.width));
-  const photoHeight = (photoWidth * images[0].height) / images[0].width;
-
-  const canvas = document.createElement("canvas");
-  canvas.width = photoWidth + STRIP_PADDING * 2;
-  canvas.height =
-    STRIP_PADDING * 2 + photoHeight * images.length + PHOTO_GAP * (images.length - 1);
-
-  const context = canvas.getContext("2d");
-  if (!context) return "";
-
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, canvas.width, canvas.height);
-
-  images.forEach((img, index) => {
-    const y = STRIP_PADDING + index * (photoHeight + PHOTO_GAP);
-    context.drawImage(img, STRIP_PADDING, y, photoWidth, photoHeight);
-  });
-
-  return canvas.toDataURL("image/png");
-}
 
 export default function Booth() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const [photos, setPhotos] = useState<string[]>([]);
-  const [isCapturing, setIsCapturing] = useState(false);
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const [flash, setFlash] = useState(false);
-  const [stripUrl, setStripUrl] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<PhotoFilter>(FILTERS[0]);
+  const [stripUrl, setStripUrl] = useState<string | null>(null);
 
-  // Start the camera
+  // Camera device access stays local to this component: refs must be read
+  // inside the event handlers that use them, not returned from a shared hook.
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -112,7 +30,6 @@ export default function Booth() {
     }
   };
 
-  // Stop the camera
   const stopCamera = () => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
@@ -121,71 +38,23 @@ export default function Booth() {
     }
   };
 
-  // Grab a single frame from the video stream
-  const takeSnapshot = (): string | null => {
-    if (!videoRef.current || !canvasRef.current) return null;
-    const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-    if (!context) return null;
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    context.filter = selectedFilter.css;
-    context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
-    if (selectedFilter.id === "vintage") {
-      context.filter = "none";
-      applyFilmGrain(context, canvas.width, canvas.height);
-      applyVignette(context, canvas.width, canvas.height);
-    }
-
-    return canvas.toDataURL("image/png");
-  };
-
-  // Capture a full 4-shot photobooth session
-  const startPhotoSession = async () => {
-    setPhotos([]);
-    setStripUrl(null);
-    setIsCapturing(true);
-
-    for (let shot = 0; shot < TOTAL_SHOTS; shot++) {
-      for (let s = COUNTDOWN_SECONDS; s > 0; s--) {
-        setCountdown(s);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-      setCountdown(null);
-
-      setFlash(true);
-      const dataUrl = takeSnapshot();
-      if (dataUrl) {
-        setPhotos((prev) => [...prev, dataUrl]);
-      }
-      await new Promise((resolve) => setTimeout(resolve, 150));
-      setFlash(false);
-    }
-
-    setIsCapturing(false);
-  };
+  const session = usePhotoSession({
+    totalShots: TOTAL_SHOTS,
+    countdownSeconds: COUNTDOWN_SECONDS,
+    captureShot: () => {
+      if (!videoRef.current || !canvasRef.current) return null;
+      return captureFrame(videoRef.current, canvasRef.current, selectedFilter);
+    },
+    onComplete: (photos) => {
+      stopCamera();
+      composeStrip(photos).then(setStripUrl);
+    },
+  });
 
   const retake = () => {
-    setPhotos([]);
+    session.retake();
     setStripUrl(null);
   };
-
-  // Once all shots are in, stop the camera and compose the printable strip
-  useEffect(() => {
-    if (photos.length !== TOTAL_SHOTS) return;
-    stopCamera();
-
-    let cancelled = false;
-    composeStrip(photos).then((url) => {
-      if (!cancelled) setStripUrl(url);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [photos]);
-
-  const sessionComplete = photos.length === TOTAL_SHOTS;
 
   return (
     <div className="w-full flex flex-col items-center justify-center gap-6">
@@ -195,7 +64,7 @@ export default function Booth() {
       </p>
 
       {/* Video Stream */}
-      {!sessionComplete && (
+      {!session.sessionComplete && (
         <div className="relative">
           <video
             ref={videoRef}
@@ -212,7 +81,7 @@ export default function Booth() {
           </button>
           <div
             className={`absolute inset-0 rounded-lg bg-white pointer-events-none transition-opacity duration-150 ${
-              flash ? "opacity-90" : "opacity-0"
+              session.flash ? "opacity-90" : "opacity-0"
             }`}
           />
           {selectedFilter.id === "vintage" && (
@@ -227,7 +96,7 @@ export default function Booth() {
       )}
 
       {/* Filter Picker */}
-      {!sessionComplete && !isCapturing && (
+      {!session.sessionComplete && !session.isCapturing && (
         <div className="flex gap-2 flex-wrap justify-center">
           {FILTERS.map((f) => (
             <button
@@ -246,9 +115,9 @@ export default function Booth() {
       )}
 
       {/* Capture Button */}
-      {!sessionComplete && !isCapturing && (
+      {!session.sessionComplete && !session.isCapturing && (
         <button
-          onClick={startPhotoSession}
+          onClick={session.start}
           className="bg-secondary text-white px-6 py-3 rounded-full shadow-md hover:scale-105 transition-transform"
         >
           📸 Take {TOTAL_SHOTS} Photos
@@ -256,28 +125,28 @@ export default function Booth() {
       )}
 
       {/* Capture Progress */}
-      {isCapturing && (
+      {session.isCapturing && (
         <div className="flex flex-col items-center gap-2">
-          {countdown !== null ? (
+          {session.countdown !== null ? (
             <span className="font-display text-6xl font-bold text-secondary">
-              {countdown}
+              {session.countdown}
             </span>
           ) : (
             <span className="loading loading-spinner loading-lg text-primary-content" />
           )}
           <span className="font-mono text-sm text-primary-content">
-            {countdown !== null
-              ? `Get ready! Photo ${photos.length + 1}/${TOTAL_SHOTS}`
-              : `Taking photo ${photos.length + 1}/${TOTAL_SHOTS}...`}
+            {session.countdown !== null
+              ? `Get ready! Photo ${session.photos.length + 1}/${TOTAL_SHOTS}`
+              : `Taking photo ${session.photos.length + 1}/${TOTAL_SHOTS}...`}
           </span>
         </div>
       )}
 
       {/* Photo Strip */}
-      {sessionComplete && (
+      {session.sessionComplete && (
         <div className="flex flex-col items-center gap-4">
           <div className="flex flex-col gap-3 bg-white p-3 rounded-lg shadow-md">
-            {photos.map((src, index) => (
+            {session.photos.map((src, index) => (
               <div key={index} className="relative w-56 aspect-4/3">
                 <Image
                   src={src}
