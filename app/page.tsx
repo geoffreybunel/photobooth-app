@@ -46,7 +46,7 @@ export default function Home() {
             <span className="relative inline-block">
               it&apos;s <span className="text-primary">time</span>
               <svg viewBox="0 0 220 14" preserveAspectRatio="none">
-                <path d="M2 10 C 40 2, 180 2, 218 10" stroke="#FFC145" stroke-width="6" fill="none" stroke-linecap="round"></path>
+                <path d="M2 10 C 40 2, 180 2, 218 10" stroke="#FFC145" strokeWidth="6" fill="none" strokeLinecap="round"></path>
               </svg>
             </span>
           </h1>
