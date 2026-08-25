@@ -1,12 +1,23 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { usePhotoSession } from "@/src/hooks/usePhotoSession";
 import { captureFrame, composeStrip, FILTERS, type PhotoFilter } from "@/src/lib/photobooth";
+import {
+  getCameraDevicesServerSnapshot,
+  getCameraDevicesSnapshot,
+  refreshCameraDevices,
+  subscribeToCameraDevices,
+} from "@/src/lib/cameraDevices";
 
 const TOTAL_SHOTS = 4;
-const COUNTDOWN_SECONDS = 3;
+
+const COUNTDOWN_OPTIONS = [
+  { label: "Quick", seconds: 3 },
+  { label: "Standard", seconds: 5 },
+  { label: "Relaxed", seconds: 10 },
+];
 
 export default function Booth() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -14,17 +25,31 @@ export default function Booth() {
   const streamRef = useRef<MediaStream | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<PhotoFilter>(FILTERS[0]);
   const [stripUrl, setStripUrl] = useState<string | null>(null);
+  const [deviceIdOverride, setDeviceIdOverride] = useState<string | null>(null);
+  const [countdownSeconds, setCountdownSeconds] = useState(COUNTDOWN_OPTIONS[0].seconds);
+
+  // Camera list is external browser state (labels arrive later, devices can be
+  // hot-plugged), so it's read from a store rather than fetched in an effect.
+  const devices = useSyncExternalStore(
+    subscribeToCameraDevices,
+    getCameraDevicesSnapshot,
+    getCameraDevicesServerSnapshot
+  );
+  const selectedDeviceId = deviceIdOverride ?? devices[0]?.deviceId ?? null;
 
   // Camera device access stays local to this component: refs must be read
   // inside the event handlers that use them, not returned from a shared hook.
-  const startCamera = async () => {
+  const startCamera = async (deviceId?: string) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: deviceId ? { deviceId: { exact: deviceId } } : true,
+      });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
       }
+      refreshCameraDevices();
     } catch (error) {
       console.error("Error accessing the camera:", error);
     }
@@ -38,9 +63,17 @@ export default function Booth() {
     }
   };
 
+  const switchCamera = (deviceId: string) => {
+    setDeviceIdOverride(deviceId);
+    if (streamRef.current) {
+      stopCamera();
+      startCamera(deviceId);
+    }
+  };
+
   const session = usePhotoSession({
     totalShots: TOTAL_SHOTS,
-    countdownSeconds: COUNTDOWN_SECONDS,
+    countdownSeconds,
     captureShot: () => {
       if (!videoRef.current || !canvasRef.current) return null;
       return captureFrame(videoRef.current, canvasRef.current, selectedFilter);
@@ -68,13 +101,13 @@ export default function Booth() {
         <div className="relative">
           <video
             ref={videoRef}
-            className="rounded-lg shadow-md"
+            className="rounded-lg shadow-md bg-black"
             style={{ filter: selectedFilter.css }}
             autoPlay
             playsInline
           />
           <button
-            onClick={startCamera}
+            onClick={() => startCamera(selectedDeviceId ?? undefined)}
             className="absolute top-2 left-2 bg-primary text-white px-4 py-2 rounded-md shadow-md"
           >
             Start Camera
@@ -95,6 +128,21 @@ export default function Booth() {
         </div>
       )}
 
+      {/* Camera Picker */}
+      {!session.sessionComplete && !session.isCapturing && devices.length > 1 && (
+        <select
+          value={selectedDeviceId ?? ""}
+          onChange={(e) => switchCamera(e.target.value)}
+          className="px-3 py-1.5 rounded-full text-sm font-mono shadow-md bg-white text-neutral-content max-w-xs"
+        >
+          {devices.map((d, index) => (
+            <option key={d.deviceId} value={d.deviceId}>
+              {d.label || `Camera ${index + 1}`}
+            </option>
+          ))}
+        </select>
+      )}
+
       {/* Filter Picker */}
       {!session.sessionComplete && !session.isCapturing && (
         <div className="flex gap-2 flex-wrap justify-center">
@@ -109,6 +157,25 @@ export default function Booth() {
               }`}
             >
               {f.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Timer Picker */}
+      {!session.sessionComplete && !session.isCapturing && (
+        <div className="flex gap-2 flex-wrap justify-center">
+          {COUNTDOWN_OPTIONS.map((option) => (
+            <button
+              key={option.seconds}
+              onClick={() => setCountdownSeconds(option.seconds)}
+              className={`px-3 py-1.5 rounded-full text-sm font-mono shadow-md transition-colors ${
+                countdownSeconds === option.seconds
+                  ? "bg-secondary text-white"
+                  : "bg-white text-neutral-content hover:bg-neutral-100"
+              }`}
+            >
+              {option.label} · {option.seconds}s
             </button>
           ))}
         </div>
