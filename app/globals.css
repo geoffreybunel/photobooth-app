@@ -3,18 +3,18 @@
 
 @plugin "daisyui/theme" {
   name: "photobooth-warm";
-  --color-primary: hsl(8 100% 68%);
-  --color-primary-content: hsl(340 20% 12%);
-  --color-secondary: hsl(40 100% 63%);
-  --color-secondary-content: hsl(340 20% 12%);
-  --color-accent: hsl(172 63% 45%);
-  --color-accent-content: hsl(340 20% 12%);
-  --color-neutral: hsl(315 32% 17%);
-  --color-neutral-content: hsl(40 60% 95%);
-  --color-base-100: hsl(42 100% 94%);
-  --color-base-200: hsl(40 70% 89%);
-  --color-base-300: hsl(38 50% 82%);
-  --color-base-content: hsl(315 32% 17%);
+  --color-primary: #e8624c;
+  --color-primary-content: #ffffff;
+  --color-secondary: #f0b429;
+  --color-secondary-content: #1f1a1d;
+  --color-accent: #2ec4b6;
+  --color-accent-content: #ffffff;
+  --color-neutral: #26191f;
+  --color-neutral-content: #fcfbf9;
+  --color-base-100: #fcfbf9;
+  --color-base-200: #faf9f7;
+  --color-base-300: #ede9e4;
+  --color-base-content: #1f1a1d;
 }
 
 @theme {
@@ -24,11 +24,9 @@
 }
 
 body {
-  background: var(--cream);
-  background-image: 
-    radial-gradient(circle at 8% 15%, rgba(255, 193, 69, 0.35) 0%, transparent 40%), 
-    radial-gradient(circle at 92% 80%, rgba(46, 196, 182, 0.25) 0%, transparent 40%);
-  color: var(--plum);
+  background: var(--color-base-100);
+  background-image: linear-gradient(180deg, #fff9f2 0%, #fcfbf9 34%, #f8faf9 100%);
+  color: var(--color-base-content);
   font-family: 'Work Sans', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;

@@ -15,9 +15,20 @@ export const FILTERS: PhotoFilter[] = [
   },
 ];
 
+export type StripFrame = { id: string; label: string; color: string; captionColor: string };
+
+export const FRAMES: StripFrame[] = [
+  { id: "white", label: "White", color: "#ffffff", captionColor: "#c0b9bd" },
+  { id: "coral", label: "Coral", color: "#e8624c", captionColor: "rgba(255,255,255,0.85)" },
+  { id: "gold", label: "Gold", color: "#f0b429", captionColor: "rgba(255,255,255,0.85)" },
+  { id: "teal", label: "Teal", color: "#2ec4b6", captionColor: "rgba(255,255,255,0.85)" },
+  { id: "ink", label: "Ink", color: "#26191f", captionColor: "rgba(255,255,255,0.55)" },
+];
+
 const GRAIN_INTENSITY = 18;
 const STRIP_PADDING = 20;
 const PHOTO_GAP = 16;
+const CAPTION_HEIGHT = 28;
 
 // Film-grain noise, added pixel-by-pixel like an old strip photo
 function applyFilmGrain(context: CanvasRenderingContext2D, width: number, height: number) {
@@ -48,11 +59,12 @@ function applyVignette(context: CanvasRenderingContext2D, width: number, height:
   context.fillRect(0, 0, width, height);
 }
 
-// Grab the current video frame, with the given filter baked in, as a data URL
+// Grab the current video frame, with the given filter (and optional mirror) baked in
 export function captureFrame(
   video: HTMLVideoElement,
   canvas: HTMLCanvasElement,
-  filter: PhotoFilter
+  filter: PhotoFilter,
+  mirror: boolean
 ): string | null {
   const context = canvas.getContext("2d");
   if (!context) return null;
@@ -60,7 +72,13 @@ export function captureFrame(
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   context.filter = filter.css;
+
+  if (mirror) {
+    context.translate(canvas.width, 0);
+    context.scale(-1, 1);
+  }
   context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  context.setTransform(1, 0, 0, 1, 0, 0);
 
   if (filter.id === "vintage") {
     context.filter = "none";
@@ -71,8 +89,17 @@ export function captureFrame(
   return canvas.toDataURL("image/png");
 }
 
-// Stack a set of shots into one vertical, printable strip
-export async function composeStrip(shots: string[]): Promise<string> {
+// DD.MM.YY, printed on the strip like a real photobooth's date stamp
+export function formatDateStamp(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${String(date.getFullYear()).slice(-2)}`;
+}
+
+// Stack a set of shots into one vertical, printable strip with a colored frame + date stamp
+export async function composeStrip(
+  shots: string[],
+  frame: StripFrame
+): Promise<string> {
   const images = await Promise.all(
     shots.map(
       (src) =>
@@ -91,18 +118,28 @@ export async function composeStrip(shots: string[]): Promise<string> {
   const canvas = document.createElement("canvas");
   canvas.width = photoWidth + STRIP_PADDING * 2;
   canvas.height =
-    STRIP_PADDING * 2 + photoHeight * images.length + PHOTO_GAP * (images.length - 1);
+    STRIP_PADDING * 2 +
+    photoHeight * images.length +
+    PHOTO_GAP * (images.length - 1) +
+    CAPTION_HEIGHT;
 
   const context = canvas.getContext("2d");
   if (!context) return "";
 
-  context.fillStyle = "#ffffff";
+  context.fillStyle = frame.color;
   context.fillRect(0, 0, canvas.width, canvas.height);
 
   images.forEach((img, index) => {
     const y = STRIP_PADDING + index * (photoHeight + PHOTO_GAP);
     context.drawImage(img, STRIP_PADDING, y, photoWidth, photoHeight);
   });
+
+  const captionY =
+    STRIP_PADDING + photoHeight * images.length + PHOTO_GAP * (images.length - 1) + CAPTION_HEIGHT * 0.65;
+  context.fillStyle = frame.captionColor;
+  context.font = "11px 'Space Mono', monospace";
+  context.textAlign = "center";
+  context.fillText(formatDateStamp(new Date()), canvas.width / 2, captionY);
 
   return canvas.toDataURL("image/png");
 }
