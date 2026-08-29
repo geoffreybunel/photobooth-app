@@ -34,9 +34,6 @@ const COUNTDOWN_OPTIONS = [
   { label: "Relaxed", seconds: 10 },
 ];
 
-const SWATCH_BG =
-  "linear-gradient(150deg, rgba(255,255,255,.14) 0 6px, transparent 6px 12px), linear-gradient(155deg, #7A5C6E, #33212C)";
-
 function describeCameraError(error: unknown): string {
   const name = error instanceof DOMException ? error.name : "";
   switch (name) {
@@ -307,13 +304,28 @@ export default function Booth() {
                     selectedFilter.id === f.id ? "ring-2 ring-primary border-transparent" : "border-base-300"
                   }`}
                 >
-                  <span className="aspect-square rounded-lg block" style={{ backgroundImage: SWATCH_BG, filter: f.css }} />
+                  <span className="relative aspect-square rounded-lg overflow-hidden bg-neutral block">
+                    <Image
+                      src="/filter-preview-camera.jpg"
+                      alt=""
+                      fill
+                      sizes="120px"
+                      className="object-cover"
+                      style={{ filter: f.css }}
+                    />
+                    {f.id === "vintage" && (
+                      <span
+                        className="absolute inset-0 pointer-events-none"
+                        style={{ boxShadow: "inset 0 0 10px 4px rgba(0,0,0,0.45)" }}
+                      />
+                    )}
+                  </span>
                   <span className="text-xs font-medium pl-0.5">{f.label}</span>
                 </button>
               ))}
             </div>
             <p className="text-[11px] leading-relaxed text-base-content/55 m-0">
-              Previews show a sample look. The filter is baked into each photo you take.
+              Sample preview. The filter is baked into each photo you take.
             </p>
           </div>
         </div>
@@ -385,7 +397,7 @@ export default function Booth() {
             {!isCameraOn && (
               <button
                 onClick={() => startCamera(selectedDeviceId ?? undefined)}
-                className="absolute top-3.5 left-3.5 bg-primary text-primary-content text-sm font-medium px-4 py-2 rounded-md shadow-md"
+                className="absolute top-3.5 left-3.5 bg-primary text-primary-content text-sm font-medium px-4 py-2 rounded-md shadow-md hover:cursor-pointer"
               >
                 Start Camera
               </button>
