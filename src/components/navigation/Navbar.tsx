@@ -9,7 +9,7 @@ export default function Navbar() {
                 Joysnap
             </Link>
         </div>
-        <div className="flex gap-10 text-primary-content font-mono font-bold text-sm uppercase tracking-wide">
+        <div className="flex gap-10 font-mono font-bold text-sm uppercase tracking-wide">
             <Link href="/About">
                 About
             </Link>
