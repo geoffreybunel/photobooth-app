@@ -1,27 +1,13 @@
+import Image from "next/image";
 import Link from "next/link";
+import { FILTERS } from "@/src/lib/photobooth";
 
-const FRAMES = [
-  {
-    name: "Filtre 1",
-    desc: "Bordure chaude",
-    gradient: "linear-gradient(150deg, hsl(var(--color-secondary)), hsl(var(--color-primary)))",
-  },
-  {
-    name: "Filtre 2",
-    desc: "Contraste frais",
-    gradient: "linear-gradient(150deg, hsl(var(--color-accent)), hsl(315 32% 30%))",
-  },
-  {
-    name: "Filtre 3",
-    desc: "Classique vintage",
-    gradient: "linear-gradient(150deg, hsl(var(--color-primary)), hsl(var(--color-neutral)))",
-  },
-  {
-    name: "Filtre 4",
-    desc: "Minimal festif",
-    gradient: "linear-gradient(150deg, hsl(var(--color-neutral)), hsl(var(--color-secondary)))",
-  },
-];
+const FILTER_TAGLINES: Record<string, string> = {
+  original: "True to life",
+  bw: "Timeless contrast",
+  sepia: "Warm & nostalgic",
+  vintage: "Grainy & faded",
+};
 
 const STRIP_COLORS = [
   "linear-gradient(135deg, hsl(var(--color-accent)), hsl(172 60% 32%))",
@@ -166,21 +152,33 @@ export default function Home() {
       </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-        {FRAMES.map((frame) => (
+        {FILTERS.map((filter) => (
           <div
-            key={frame.name}
+            key={filter.id}
             className="card bg-[#FFFDF8] rounded-2xl shadow-md hover:-translate-y-1.5 transition-transform"
           >
             <div className="card-body p-4">
-              <div
-                className="aspect-3/4 rounded-xl mb-3"
-                style={{ background: frame.gradient }}
-              />
+              <div className="relative aspect-3/4 rounded-xl mb-3 overflow-hidden bg-neutral">
+                <Image
+                  src="/filter-preview-camera.jpg"
+                  alt=""
+                  fill
+                  sizes="(min-width: 768px) 25vw, 50vw"
+                  className="object-cover"
+                  style={{ filter: filter.css }}
+                />
+                {filter.id === "vintage" && (
+                  <span
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ boxShadow: "inset 0 0 24px 10px rgba(0,0,0,0.45)" }}
+                  />
+                )}
+              </div>
               <p className="font-display font-semibold text-sm">
-                {frame.name}
+                {filter.label}
               </p>
               <p className="font-mono text-[10px] uppercase mt-1 text-base-content/55">
-                {frame.desc}
+                {FILTER_TAGLINES[filter.id]}
               </p>
             </div>
           </div>
