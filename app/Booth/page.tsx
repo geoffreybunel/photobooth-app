@@ -296,7 +296,7 @@ export default function Booth() {
               Filter
             </span>
             <div className="grid grid-cols-2 gap-2">
-              {FILTERS.map((f) => (
+              {FILTERS.map((f, index) => (
                 <button
                   key={f.id}
                   onClick={() => setSelectedFilter(f)}
@@ -312,6 +312,7 @@ export default function Booth() {
                       sizes="120px"
                       className="object-cover"
                       style={{ filter: f.css }}
+                      preload={index === 0}
                     />
                     {f.id === "vintage" && (
                       <span

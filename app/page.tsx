@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FILTERS } from "@/src/lib/photobooth";
+import { FILTERS, formatDateStamp } from "@/src/lib/photobooth";
 
 const FILTER_TAGLINES: Record<string, string> = {
   original: "True to life",
@@ -9,11 +9,8 @@ const FILTER_TAGLINES: Record<string, string> = {
   vintage: "Grainy & faded",
 };
 
-const STRIP_COLORS = [
-  "linear-gradient(135deg, hsl(var(--color-accent)), hsl(172 60% 32%))",
-  "linear-gradient(135deg, hsl(var(--color-primary)), hsl(8 70% 48%))",
-  "linear-gradient(135deg, hsl(var(--color-secondary)), hsl(40 80% 45%))",
-];
+// One real photobooth shot — each filter thumbnail reuses it with a different look applied.
+const HERO_PHOTO = "/photobooth-pinup.jpg";
 
 export default function Home() {
   return (
@@ -85,24 +82,27 @@ export default function Home() {
             <div className="card-body p-5">
               <div className="flex justify-between items-center mb-3">
                 <span className="font-mono text-[11px] flex items-center gap-2 text-primary">
-                  <span className="w-2 h-2 rounded-full bg-primary" />
-                  READY
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  Shooting
                 </span>
                 <span className="font-mono text-[11px] text-neutral-content/50">
-                  02 / 03
+                  1 / 4
                 </span>
               </div>
 
-              <div
-                className="rounded-2xl aspect-4/5 flex items-center justify-center mb-4"
-                style={{
-                  background:
-                    "linear-gradient(160deg, hsl(315 30% 32%), hsl(315 40% 18%))",
-                }}
-              >
+              <div className="relative rounded-2xl aspect-4/5 overflow-hidden flex items-center justify-center mb-4">
+                <Image
+                  src={HERO_PHOTO}
+                  alt=""
+                  fill
+                  sizes="288px"
+                  className="object-cover"
+                  preload
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/15 to-black/25" />
                 <span
-                  className="font-display font-bold text-7xl text-secondary"
-                  style={{ textShadow: "0 6px 0 rgba(0,0,0,0.15)" }}
+                  className="relative font-display font-bold text-7xl text-white"
+                  style={{ textShadow: "0 2px 30px rgba(0,0,0,.45)" }}
                 >
                   3
                 </span>
@@ -125,15 +125,26 @@ export default function Home() {
               className="absolute -top-2.5 left-1/2 w-11 h-5 rounded-sm bg-secondary/85"
               style={{ transform: "translateX(-50%) rotate(-4deg)" }}
             />
-            {STRIP_COLORS.map((gradient, i) => (
-              <div
-                key={i}
-                className="aspect-square rounded-[3px] mb-2"
-                style={{ background: gradient }}
-              />
+            {FILTERS.map((filter) => (
+              <div key={filter.id} className="relative aspect-square rounded-[3px] overflow-hidden mb-2">
+                <Image
+                  src={HERO_PHOTO}
+                  alt=""
+                  fill
+                  sizes="88px"
+                  className="object-cover"
+                  style={{ filter: filter.css }}
+                />
+                {filter.id === "vintage" && (
+                  <span
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ boxShadow: "inset 0 0 8px 3px rgba(0,0,0,0.45)" }}
+                  />
+                )}
+              </div>
             ))}
             <p className="font-mono text-center text-[9px] text-base-content/55">
-              04.08.26
+              {formatDateStamp(new Date())}
             </p>
           </div>
         </div>
