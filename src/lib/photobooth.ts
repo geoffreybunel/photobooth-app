@@ -19,11 +19,21 @@ export type StripFrame = { id: string; label: string; color: string; captionColo
 
 export const FRAMES: StripFrame[] = [
   { id: "white", label: "White", color: "#ffffff", captionColor: "#c0b9bd" },
-  { id: "coral", label: "Coral", color: "#e8624c", captionColor: "rgba(255,255,255,0.85)" },
-  { id: "gold", label: "Gold", color: "#f0b429", captionColor: "rgba(255,255,255,0.85)" },
-  { id: "teal", label: "Teal", color: "#2ec4b6", captionColor: "rgba(255,255,255,0.85)" },
-  { id: "ink", label: "Ink", color: "#26191f", captionColor: "rgba(255,255,255,0.55)" },
+  { id: "black", label: "Black", color: "#26191f", captionColor: "rgba(255,255,255,0.55)" },
 ];
+
+// Picks a readable caption color for any custom frame color the user chooses.
+export function captionColorFor(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.6 ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.55)";
+}
+
+export function customFrame(color: string): StripFrame {
+  return { id: "custom", label: "Custom", color, captionColor: captionColorFor(color) };
+}
 
 const GRAIN_INTENSITY = 18;
 const STRIP_PADDING = 20;

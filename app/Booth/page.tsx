@@ -6,6 +6,7 @@ import { usePhotoSession } from "@/src/hooks/usePhotoSession";
 import {
   captureFrame,
   composeStrip,
+  customFrame,
   formatDateStamp,
   FILTERS,
   FRAMES,
@@ -101,6 +102,7 @@ export default function Booth() {
   const [countdownSeconds, setCountdownSeconds] = useState(COUNTDOWN_OPTIONS[0].seconds);
   const [mirror, setMirror] = useState(true);
   const [frame, setFrame] = useState<StripFrame>(FRAMES[0]);
+  const [customColor, setCustomColor] = useState("#e8624c");
   const [cameraError, setCameraError] = useState<string | null>(null);
 
   // Camera list and fullscreen state are external browser state (labels arrive
@@ -254,7 +256,7 @@ export default function Booth() {
                     onClick={() => changeTotalShots(n)}
                     className={`flex-1 py-2.5 rounded-[10px] border text-sm font-semibold transition-colors ${
                       totalShots === n
-                        ? "bg-neutral text-neutral-content border-neutral"
+                        ? "bg-accent text-neutral-content border-accent"
                         : "bg-white text-base-content border-base-300 hover:bg-base-200"
                     }`}
                   >
@@ -275,7 +277,7 @@ export default function Booth() {
                     onClick={() => setCountdownSeconds(option.seconds)}
                     className={`flex-1 py-2.5 rounded-[10px] border text-sm font-medium transition-colors ${
                       countdownSeconds === option.seconds
-                        ? "bg-neutral text-neutral-content border-neutral"
+                        ? "bg-accent text-neutral-content border-accent"
                         : "bg-white text-base-content border-base-300 hover:bg-base-200"
                     }`}
                   >
@@ -301,7 +303,7 @@ export default function Booth() {
                   key={f.id}
                   onClick={() => setSelectedFilter(f)}
                   className={`relative border rounded-[13px] p-1.5 flex flex-col gap-1.5 text-left bg-white ${
-                    selectedFilter.id === f.id ? "ring-2 ring-primary border-transparent" : "border-base-300"
+                    selectedFilter.id === f.id ? "ring-2 ring-accent border-transparent" : "border-base-300"
                   }`}
                 >
                   <span className="relative aspect-square rounded-lg overflow-hidden bg-neutral block">
@@ -451,6 +453,25 @@ export default function Booth() {
               Reset
             </button>
           </div>
+
+          <div className="bg-white border border-base-300 rounded-[18px] p-4.5 flex flex-col gap-3">
+            <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-base-content/55">
+              Download
+            </span>
+            <p className="text-[11px] leading-relaxed text-base-content/55 m-0">
+              {session.sessionComplete
+                ? "Your strip is ready."
+                : `Finish all ${totalShots} shot${totalShots > 1 ? "s" : ""} to unlock the download.`}
+            </p>
+            <a
+              href={stripUrl ?? undefined}
+              download="photobooth-strip.png"
+              aria-disabled={!stripUrl}
+              className="bg-primary text-neutral-content text-sm font-medium py-2.5 rounded-[10px] text-center aria-disabled:opacity-50 aria-disabled:pointer-events-none"
+            >
+              Download Strip
+            </a>
+          </div>
         </div>
 
         {/* RIGHT: live strip */}
@@ -466,13 +487,13 @@ export default function Booth() {
             </div>
 
             <div
-              className="rounded-[10px] p-2.5 pb-4 flex flex-col gap-1.5 shadow-[0_6px_18px_-10px_rgba(31,26,29,0.28)]"
+              className="p-2.5 pb-4 flex flex-col gap-1.5 shadow-[0_6px_18px_-10px_rgba(31,26,29,0.28)]"
               style={{ background: frame.color }}
             >
               {Array.from({ length: totalShots }).map((_, i) => (
                 <div
                   key={i}
-                  className="relative aspect-4/3 rounded-[5px] overflow-hidden bg-[#f1ede9] flex items-center justify-center"
+                  className="relative aspect-4/3 overflow-hidden bg-[#f1ede9] flex items-center justify-center"
                 >
                   {session.photos[i] ? (
                     <Image src={session.photos[i]} alt={`Photo ${i + 1}`} fill className="object-cover" />
@@ -506,27 +527,30 @@ export default function Booth() {
                     style={{ background: f.color }}
                   />
                 ))}
+                <label
+                  aria-label="Custom color"
+                  className={`relative w-7 h-7 rounded-lg overflow-hidden border border-base-300 cursor-pointer ${
+                    frame.id === "custom" ? "ring-2 ring-neutral ring-offset-2 ring-offset-white" : ""
+                  }`}
+                  style={{
+                    background:
+                      frame.id === "custom"
+                        ? customColor
+                        : "conic-gradient(from 0deg, #e8624c, #f0b429, #2ec4b6, #6c8fe0, #b45cd1, #e8624c)",
+                  }}
+                >
+                  <input
+                    type="color"
+                    value={customColor}
+                    onChange={(e) => {
+                      setCustomColor(e.target.value);
+                      chooseFrame(customFrame(e.target.value));
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </label>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white border border-base-300 rounded-[18px] p-4.5 flex flex-col gap-3">
-            <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-base-content/55">
-              Download
-            </span>
-            <p className="text-[11px] leading-relaxed text-base-content/55 m-0">
-              {session.sessionComplete
-                ? "Your strip is ready."
-                : `Finish all ${totalShots} shot${totalShots > 1 ? "s" : ""} to unlock the download.`}
-            </p>
-            <a
-              href={stripUrl ?? undefined}
-              download="photobooth-strip.png"
-              aria-disabled={!stripUrl}
-              className="bg-neutral text-neutral-content text-sm font-medium py-2.5 rounded-[10px] text-center aria-disabled:opacity-50 aria-disabled:pointer-events-none"
-            >
-              Download Strip
-            </a>
           </div>
         </div>
       </div>
