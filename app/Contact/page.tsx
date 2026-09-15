@@ -61,11 +61,10 @@ export default function Contact() {
         </p>
 
         <h1 className="font-display font-bold text-4xl md:text-5xl leading-tight mb-5">
-          Questions, bugs, or a wedding to shoot?
+          Got a question, a bug, or an idea?
         </h1>
 
         <p className="text-base leading-relaxed text-base-content/70">
-          Joysnap doesn&apos;t have a support team — it&apos;s a one-person project.
           Send a message below and I&apos;ll get back to you.
         </p>
       </div>
@@ -122,6 +121,24 @@ export default function Contact() {
               </div>
 
               <div className="flex flex-col gap-1.5">
+                <label htmlFor="reason" className="font-mono text-[10px] uppercase tracking-wider text-base-content/55">
+                  What&apos;s this about
+                </label>
+                <select
+                  id="reason"
+                  name="reason"
+                  required
+                  defaultValue="General"
+                  className="bg-base-200 border border-base-300 rounded-[11px] px-3.5 py-2.5 text-sm"
+                >
+                  <option value="General">Just saying hi</option>
+                  <option value="Question">A question</option>
+                  <option value="Bug">A bug</option>
+                  <option value="Feature idea">A feature idea</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
                 <label htmlFor="message" className="font-mono text-[10px] uppercase tracking-wider text-base-content/55">
                   Message
                 </label>
@@ -143,7 +160,7 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="self-start bg-primary border-none font-display font-semibold text-white rounded-full shadow-[0_6px_0_hsl(8_70%_52%)] py-3.5 px-7 transition-transform duration-150 ease-in-out hover:-translate-y-1 disabled:opacity-60 disabled:hover:translate-y-0"
+                className="cursor-pointer self-start bg-primary border-none font-display font-semibold text-white rounded-full shadow-[0_6px_0_hsl(8_70%_52%)] py-3.5 px-7 transition-transform duration-150 ease-in-out hover:-translate-y-1 disabled:opacity-60 disabled:hover:translate-y-0"
               >
                 {status === "sending" ? "Sending..." : "Send message"}
               </button>
