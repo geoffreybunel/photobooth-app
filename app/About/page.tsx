@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "About",
+  description:
+    "What Joysnap does today — a camera picker, 1 to 4 shots, real filters, and colored frames — and what's coming next: paired long-distance booths and event QR codes.",
+};
 
 const FEATURES = [
   {

@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { FILTERS, formatDateStamp } from "@/src/lib/photobooth";
+
+export const metadata: Metadata = {
+  title: "Strike a pose, it's time",
+  description:
+    "Open the photobooth, let the countdown do its magic, and leave with your photo strip. No app, no account — just your camera.",
+};
 
 const FILTER_TAGLINES: Record<string, string> = {
   original: "True to life",

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fredoka, Space_Mono, Work_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/src/components/navigation/Navbar";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/src/lib/site";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -22,8 +23,25 @@ const workSans = Work_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "photobooth-app — Prends la pose, c'est parti",
-  description: "Le photobooth en ligne, sans borne ni compte.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Joysnap — Photobooth in your browser",
+    template: "%s · Joysnap",
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    siteName: SITE_NAME,
+    title: "Joysnap — Photobooth in your browser",
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Joysnap — Photobooth in your browser",
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
@@ -33,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="fr"
+      lang="en"
       data-theme="photobooth-warm"
       className={`${fredoka.variable} ${spaceMono.variable} ${workSans.variable}`}
     >
