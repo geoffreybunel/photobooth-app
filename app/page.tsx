@@ -132,7 +132,7 @@ export default function Home() {
               className="absolute -top-2.5 left-1/2 w-11 h-5 rounded-sm bg-secondary/85"
               style={{ transform: "translateX(-50%) rotate(-4deg)" }}
             />
-            {FILTERS.map((filter) => (
+            {FILTERS.map((filter, index) => (
               <div key={filter.id} className="relative aspect-square rounded-[3px] overflow-hidden mb-2">
                 <Image
                   src={HERO_PHOTO}
@@ -141,6 +141,7 @@ export default function Home() {
                   sizes="88px"
                   className="object-cover"
                   style={{ filter: filter.css }}
+                  preload={index === 0}
                 />
                 {filter.id === "vintage" && (
                   <span
