@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { FILTERS, formatDateStamp } from "@/src/lib/photobooth";
+import { FILTERS } from "@/src/lib/photobooth";
+import HeroBoothDemo from "@/src/components/home/HeroBoothDemo";
 
 export const metadata: Metadata = {
   title: "Strike a pose, it's time",
@@ -16,193 +17,336 @@ const FILTER_TAGLINES: Record<string, string> = {
   vintage: "Grainy & faded",
 };
 
-// One real photobooth shot — each filter thumbnail reuses it with a different look applied.
-const HERO_PHOTO = "/photobooth-pinup.jpg";
+const HOW_IT_WORKS = [
+  {
+    n: "01",
+    dot: "bg-primary/12 text-primary",
+    title: "Pick your look",
+    desc: "Four filters, previewed live on your own camera before you commit.",
+  },
+  {
+    n: "02",
+    dot: "bg-secondary/20 text-[#8A5B00]",
+    title: "Pose on the beep",
+    desc: "A 3, 5, or 10 second countdown between shots — plenty of time to regroup.",
+  },
+  {
+    n: "03",
+    dot: "bg-accent/18 text-[#0B5F58]",
+    title: "Keep the strip",
+    desc: "Download the full strip in HD, ready to keep or print.",
+  },
+];
+
+const BENTO = [
+  {
+    kind: "dark" as const,
+    eyebrow: "Private by default",
+    title: "Your camera stays on your device. Nothing is uploaded until you ask.",
+    pills: ["No sign-up", "No tracking", "No cookies"],
+  },
+  {
+    kind: "light" as const,
+    iconBg: "bg-accent/16",
+    iconColor: "text-[#0B5F58]",
+    icon: <span className="w-[18px] h-[18px] rounded-[4px] border-2 border-current" />,
+    title: "Your printed strip",
+    desc: "Every shot lands in a clean vertical strip, framed and dated, ready to download.",
+  },
+  {
+    kind: "light" as const,
+    iconBg: "bg-primary/12",
+    iconColor: "text-primary",
+    icon: <span className="font-mono font-bold text-[11px]">CAM</span>,
+    title: "Pick your camera",
+    desc: "Switch between any connected webcam right from the booth — no setup required.",
+  },
+  {
+    kind: "light" as const,
+    iconBg: "bg-secondary/20",
+    iconColor: "text-[#8A5B00]",
+    icon: <span className="font-mono font-bold text-[12px]">5s</span>,
+    title: "Your pace",
+    desc: "Set the gap between shots, mirror the preview, or go fullscreen for an event.",
+  },
+  {
+    kind: "light" as const,
+    iconBg: "bg-base-300",
+    iconColor: "text-base-content",
+    icon: <span className="font-mono font-bold text-[12px]">HD</span>,
+    title: "Print-ready files",
+    desc: "Full-resolution export with a real date stamp, ready for the fridge door.",
+  },
+];
+
+const MARQUEE_PHOTOS = ["/photobooth-pinup.jpg", "/filter-preview-camera.jpg"];
+const MARQUEE_TILES = [0, 1].flatMap((round) =>
+  FILTERS.flatMap((filter) =>
+    MARQUEE_PHOTOS.map((photo) => ({
+      key: `${round}-${photo}-${filter.id}`,
+      photo,
+      css: filter.css,
+    }))
+  )
+);
 
 export default function Home() {
   return (
     <div className="w-full">
       {/* HERO */}
-      <div className="grid md:grid-cols-2 gap-14 items-center mb-24">
-        <div>
-          <p className="font-mono text-xs tracking-widest uppercase mb-3 flex items-center gap-2 text-primary">
-            <span className="w-4 h-0.5 inline-block bg-primary" />
-            No account needed
-          </p>
+      <section className="relative w-screen ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] px-6 pt-6 pb-4 overflow-hidden">
+        <div
+          className="absolute -top-[220px] -left-40 w-[720px] h-[720px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(240,180,41,0.34), transparent 66%)" }}
+        />
+        <div
+          className="absolute top-[340px] -right-[220px] w-[680px] h-[680px] rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, rgba(46,196,182,0.22), transparent 66%)" }}
+        />
 
-          <h1 className="font-display font-bold text-4xl md:text-6xl leading-tight mb-5">
-          Strike a pose,
-            <br />
-            <span className="relative inline-block">
-              it&apos;s <span className="text-primary">time</span>
-              <svg viewBox="0 0 220 14" preserveAspectRatio="none">
-                <path d="M2 10 C 40 2, 180 2, 218 10" stroke="#FFC145" strokeWidth="6" fill="none" strokeLinecap="round"></path>
-              </svg>
+        <div className="relative max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          <div className="flex flex-col gap-7 min-w-0">
+            <span className="inline-flex items-center gap-2.5 self-start bg-primary/10 border border-primary/25 text-primary font-mono text-[11px] tracking-[0.14em] uppercase px-3.5 py-2 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              No account · nothing to install
             </span>
-          </h1>
 
-          <p className="text-base leading-relaxed mb-8 max-w-md text-base-content/70">
-            Open the photobooth, let the countdown do its magic, and leave with your photo strip.
-          </p>
+            <h1 className="font-display font-bold text-4xl md:text-6xl leading-[0.96] tracking-tight text-balance m-0">
+              Four seconds.
+              <br />
+              <span className="relative inline-block">
+                <span className="relative z-10">One strip</span>
+                <span className="absolute left-[-4px] right-[-4px] bottom-0 h-3.5 bg-secondary rounded-full -z-0" />
+              </span>
+              <br />
+              you&apos;ll keep.
+            </h1>
 
-          <div className="flex items-center gap-4 mb-10">
-            <Link href="/Booth" className="bg-primary border-none font-display font-semibold text-bas text-white rounded-full shadow-[0_6px_0_hsl(8_70%_52%)] py-4 px-7.5 transition-transform duration-150 ease-in-out hover:-translate-y-1">
-              📸 Open the photobooth
-            </Link>
-            <span className="font-mono text-xs text-base-content/55">
-              3 photos · 12 sec
-            </span>
-          </div>
-
-          {/* STATS */}
-          <div className="stats stats-vertical sm:stats-horizontal shadow-none bg-transparent border-t-2 border-dashed border-base-content/15">
-            <div className="stat py-3 px-0 pr-6">
-              <div className="stat-value font-display font-bold text-2xl">
-                FREE
-              </div>
-              <div className="stat-desc font-mono uppercase text-[10px] tracking-wider">
-                No accout needed
-              </div>
-            </div>
-            <div className="stat py-3 px-6">
-              <div className="stat-value font-display font-bold text-2xl">
-                4
-              </div>
-              <div className="stat-desc font-mono uppercase text-[10px] tracking-wider">
-                Filters available
-              </div>
-            </div>
-            <div className="stat py-3 px-6">
-              <div className="stat-value font-display font-bold text-2xl">
-                HD
-              </div>
-              <div className="stat-desc font-mono uppercase text-[10px] tracking-wider">
-                High-quality export
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* CAMERA / STRIP */}
-        <div className="relative flex justify-center">
-          <div className="card w-72 bg-neutral rounded-3xl shadow-xl">
-            <div className="card-body p-5">
-              <div className="flex justify-between items-center mb-3">
-                <span className="font-mono text-[11px] flex items-center gap-2 text-primary">
-                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  Shooting
-                </span>
-                <span className="font-mono text-[11px] text-neutral-content/50">
-                  1 / 4
-                </span>
-              </div>
-
-              <div className="relative rounded-2xl aspect-4/5 overflow-hidden flex items-center justify-center mb-4">
-                <Image
-                  src={HERO_PHOTO}
-                  alt=""
-                  fill
-                  sizes="288px"
-                  className="object-cover"
-                  preload
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/15 to-black/25" />
-                <span
-                  className="relative font-display font-bold text-7xl text-white"
-                  style={{ textShadow: "0 2px 30px rgba(0,0,0,.45)" }}
-                >
-                  3
-                </span>
-              </div>
-
-              <div className="flex justify-center items-center gap-4">
-                <span className="w-2.5 h-2.5 rounded-full bg-neutral-content/20" />
-                <div className="w-14 h-14 rounded-full bg-secondary border-4 border-neutral-content/85 shadow-[0_4px_0_hsl(40_80%_45%)]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-neutral-content/20" />
-              </div>
-            </div>
-          </div>
-
-          {/* Photo strip */}
-          <div
-            className="absolute -right-4 top-1 rounded-md shadow-xl p-2.5 pb-4 bg-[#FFFDF8]"
-            style={{ width: "104px", transform: "rotate(8deg)" }}
-          >
-            <div
-              className="absolute -top-2.5 left-1/2 w-11 h-5 rounded-sm bg-secondary/85"
-              style={{ transform: "translateX(-50%) rotate(-4deg)" }}
-            />
-            {FILTERS.map((filter, index) => (
-              <div key={filter.id} className="relative aspect-square rounded-[3px] overflow-hidden mb-2">
-                <Image
-                  src={HERO_PHOTO}
-                  alt=""
-                  fill
-                  sizes="88px"
-                  className="object-cover"
-                  style={{ filter: filter.css }}
-                  preload={index === 0}
-                />
-                {filter.id === "vintage" && (
-                  <span
-                    className="absolute inset-0 pointer-events-none"
-                    style={{ boxShadow: "inset 0 0 8px 3px rgba(0,0,0,0.45)" }}
-                  />
-                )}
-              </div>
-            ))}
-            <p className="font-mono text-center text-[9px] text-base-content/55">
-              {formatDateStamp(new Date())}
+            <p className="text-lg leading-relaxed text-base-content/70 max-w-[430px] m-0">
+              Pick a look, hit start, and pose. Joysnap counts you down, snaps four frames,
+              and prints them into a strip you can download in one tap.
             </p>
-          </div>
-        </div>
-      </div>
 
-      {/* CADRES DISPONIBLES */}
-      <p className="font-mono text-xs tracking-widest uppercase mb-5 flex items-center gap-3 text-primary">
-        Available filters
+            <div className="flex flex-wrap items-center gap-3.5">
+              <Link
+                href="/Booth"
+                className="flex items-center gap-2.5 bg-primary text-primary-content font-display font-semibold text-base px-7 py-4 rounded-full shadow-[0_16px_34px_-16px_rgba(232,98,76,0.6)] hover:bg-primary/90"
+              >
+                <span className="w-3 h-3 rounded-full border-2 border-white/90" />
+                Start the booth
+              </Link>
+              <Link
+                href="/#how"
+                className="flex items-center gap-2.5 bg-white border border-base-300 text-base px-6 py-4 rounded-full hover:border-base-content/30"
+              >
+                See how it works
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap gap-7 pt-1">
+              <div className="flex flex-col gap-0.5">
+                <span className="font-display font-bold text-2xl">4</span>
+                <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-base-content/55">
+                  Filters
+                </span>
+              </div>
+              <span className="w-px bg-base-300" />
+              <div className="flex flex-col gap-0.5">
+                <span className="font-display font-bold text-2xl">HD</span>
+                <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-base-content/55">
+                  Export
+                </span>
+              </div>
+              <span className="w-px bg-base-300" />
+              <div className="flex flex-col gap-0.5">
+                <span className="font-display font-bold text-2xl">Free</span>
+                <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-base-content/55">
+                  Always
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <HeroBoothDemo />
+        </div>
+      </section>
+
+      {/* MARQUEE */}
+      <section className="relative w-screen ml-[calc(50%-50vw)] mr-[calc(50%-50vw)] mt-10 py-6 bg-neutral overflow-hidden">
+        <div className="flex gap-3.5 w-max animate-[marquee_34s_linear_infinite]">
+          {MARQUEE_TILES.map((tile) => (
+            <div key={tile.key} className="relative w-[110px] h-[110px] shrink-0 rounded-lg overflow-hidden">
+              <Image
+                src={tile.photo}
+                alt=""
+                fill
+                sizes="110px"
+                className="object-cover"
+                style={{ filter: tile.css }}
+              />
+            </div>
+          ))}
+        </div>
         <span
-          className="flex-1 h-0.5"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage:
-              "repeating-linear-gradient(90deg, hsl(var(--color-base-content)/0.25) 0, hsl(var(--color-base-content)/0.25) 6px, transparent 6px, transparent 12px)",
+            background:
+              "linear-gradient(90deg, var(--color-neutral) 0%, transparent 12%, transparent 88%, var(--color-neutral) 100%)",
           }}
         />
-      </p>
+      </section>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-        {FILTERS.map((filter) => (
-          <div
-            key={filter.id}
-            className="card bg-[#FFFDF8] rounded-2xl shadow-md hover:-translate-y-1.5 transition-transform"
-          >
-            <div className="card-body p-4">
-              <div className="relative aspect-3/4 rounded-xl mb-3 overflow-hidden bg-neutral">
+      {/* HOW IT WORKS */}
+      <section id="how" className="max-w-[1180px] mx-auto px-0 pt-24 scroll-mt-24">
+        <div className="flex flex-wrap items-end justify-between gap-5 mb-10">
+          <div className="flex flex-col gap-3 min-w-0">
+            <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-primary">
+              How it works
+            </span>
+            <h2 className="font-display font-bold text-3xl md:text-[44px] leading-[1.06] tracking-tight text-balance m-0 max-w-[520px]">
+              Three taps from curious to printed.
+            </h2>
+          </div>
+          <p className="text-[15px] leading-relaxed text-base-content/70 max-w-[300px] m-0">
+            Everything happens in your browser. Your camera feed never leaves the device.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {HOW_IT_WORKS.map((step) => (
+            <div
+              key={step.n}
+              className="bg-white border border-base-300 rounded-[24px] p-6.5 flex flex-col gap-4 hover:border-base-content/20"
+            >
+              <span
+                className={`w-[38px] h-[38px] rounded-xl flex items-center justify-center font-mono font-bold text-[13px] ${step.dot}`}
+              >
+                {step.n}
+              </span>
+              <h3 className="font-display font-semibold text-xl m-0">{step.title}</h3>
+              <p className="text-sm leading-relaxed text-base-content/70 m-0">{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FILTERS */}
+      <section id="filters" className="max-w-[1180px] mx-auto px-0 pt-24 scroll-mt-24">
+        <div className="flex flex-wrap items-end justify-between gap-5 mb-10">
+          <div className="flex flex-col gap-3 min-w-0">
+            <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-primary">
+              Filters
+            </span>
+            <h2 className="font-display font-bold text-3xl md:text-[44px] leading-[1.06] tracking-tight text-balance m-0 max-w-[520px]">
+              Four looks, no wrong answer.
+            </h2>
+          </div>
+          <span className="font-mono text-[11px] tracking-[0.1em] text-base-content/55">
+            Pick one when you&apos;re in the booth
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {FILTERS.map((filter) => (
+            <div
+              key={filter.id}
+              className="bg-white border border-base-300 rounded-[24px] p-3.5 flex flex-col gap-3.5"
+            >
+              <div className="relative aspect-4/5 rounded-2xl overflow-hidden">
                 <Image
                   src="/filter-preview-camera.jpg"
                   alt=""
                   fill
-                  sizes="(min-width: 768px) 25vw, 50vw"
+                  sizes="(min-width: 1024px) 25vw, 50vw"
                   className="object-cover"
                   style={{ filter: filter.css }}
                 />
                 {filter.id === "vintage" && (
                   <span
                     className="absolute inset-0 pointer-events-none"
-                    style={{ boxShadow: "inset 0 0 24px 10px rgba(0,0,0,0.45)" }}
+                    style={{ boxShadow: "inset 0 0 54px 18px rgba(0,0,0,0.45)" }}
                   />
                 )}
               </div>
-              <p className="font-display font-semibold text-sm">
-                {filter.label}
-              </p>
-              <p className="font-mono text-[10px] uppercase mt-1 text-base-content/55">
-                {FILTER_TAGLINES[filter.id]}
-              </p>
+              <div className="flex flex-col gap-0.5 px-1 pb-1">
+                <span className="font-display font-semibold text-base">{filter.label}</span>
+                <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-base-content/55">
+                  {FILTER_TAGLINES[filter.id]}
+                </span>
+              </div>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* BENTO */}
+      <section id="about" className="max-w-[1180px] mx-auto px-0 pt-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {BENTO.map((card, index) =>
+            card.kind === "dark" ? (
+              <div
+                key={index}
+                className="min-w-0 sm:col-span-2 lg:col-span-2 bg-neutral text-neutral-content rounded-[28px] p-8 flex flex-col gap-4.5 justify-between"
+              >
+                <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-secondary">
+                  {card.eyebrow}
+                </span>
+                <h3 className="font-display font-bold text-2xl md:text-[34px] leading-[1.1] tracking-tight m-0 max-w-[420px]">
+                  {card.title}
+                </h3>
+                <div className="flex flex-wrap gap-2.5">
+                  {card.pills?.map((pill) => (
+                    <span
+                      key={pill}
+                      className="font-mono text-[10px] tracking-[0.1em] uppercase border border-neutral-content/25 rounded-full px-3.5 py-2"
+                    >
+                      {pill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div
+                key={index}
+                className="min-w-0 bg-white border border-base-300 rounded-[28px] p-6 flex flex-col gap-3.5"
+              >
+                <span
+                  className={`w-11 h-11 rounded-2xl flex items-center justify-center ${card.iconBg} ${card.iconColor}`}
+                >
+                  {card.icon}
+                </span>
+                <h3 className="font-display font-semibold text-lg m-0">{card.title}</h3>
+                <p className="text-sm leading-relaxed text-base-content/70 m-0">{card.desc}</p>
+              </div>
+            )
+          )}
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="max-w-[1180px] mx-auto px-0 pt-24">
+        <div className="relative bg-primary rounded-[34px] p-8 md:p-16 overflow-hidden flex flex-wrap items-center justify-between gap-8">
+          <span
+            className="absolute -top-[90px] -right-10 w-[320px] h-[320px] rounded-full pointer-events-none"
+            style={{ background: "rgba(240,180,41,0.35)" }}
+          />
+          <div className="relative flex flex-col gap-4 min-w-0">
+            <h2 className="font-display font-bold text-3xl md:text-5xl leading-[1.04] tracking-tight text-white text-balance m-0 max-w-[480px]">
+              The booth is open. Go make a mess of it.
+            </h2>
+            <p className="text-base leading-relaxed text-white/90 m-0 max-w-[380px]">
+              Takes about twelve seconds, start to strip.
+            </p>
           </div>
-        ))}
-      </div>
+          <Link
+            href="/Booth"
+            className="relative flex items-center gap-2.5 bg-neutral text-neutral-content font-display font-semibold text-base px-8 py-4.5 rounded-full shrink-0 hover:bg-[#1C0D14]"
+          >
+            <span className="w-3 h-3 rounded-full border-2 border-white/90" />
+            Open the photobooth
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
