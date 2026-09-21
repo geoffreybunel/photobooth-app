@@ -107,7 +107,7 @@ export default function Home() {
         <div className="relative max-w-[1180px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
           <div className="flex flex-col gap-7 min-w-0">
             <span className="inline-flex items-center gap-2.5 self-start bg-primary/10 border border-primary/25 text-primary font-mono text-[11px] tracking-[0.14em] uppercase px-3.5 py-2 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
               No account · nothing to install
             </span>
 
