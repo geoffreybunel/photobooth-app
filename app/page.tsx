@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FILTERS } from "@/src/lib/photobooth";
@@ -281,31 +282,38 @@ export default function Home() {
 
       {/* BENTO */}
       <section id="about" className="max-w-[1180px] mx-auto px-0 pt-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {BENTO.map((card, index) =>
-            card.kind === "dark" ? (
-              <div
-                key={index}
-                className="min-w-0 sm:col-span-2 lg:col-span-2 bg-neutral text-neutral-content rounded-[28px] p-8 flex flex-col gap-4.5 justify-between"
-              >
-                <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-secondary">
-                  {card.eyebrow}
-                </span>
-                <h3 className="font-display font-bold text-2xl md:text-[34px] leading-[1.1] tracking-tight m-0 max-w-[420px]">
-                  {card.title}
-                </h3>
-                <div className="flex flex-wrap gap-2.5">
-                  {card.pills?.map((pill) => (
-                    <span
-                      key={pill}
-                      className="font-mono text-[10px] tracking-[0.1em] uppercase border border-neutral-content/25 rounded-full px-3.5 py-2"
-                    >
-                      {pill}
-                    </span>
-                  ))}
-                </div>
+        <div className="flex flex-col gap-4">
+          {BENTO.filter((card) => card.kind === "dark").map((card, index) => (
+            <div
+              key={index}
+              className="min-w-0 w-full lg:w-3/4 bg-neutral text-neutral-content rounded-[28px] p-8 flex flex-col gap-4.5 justify-between"
+            >
+              <span className="font-mono text-[10px] tracking-[0.16em] uppercase text-secondary">
+                {card.eyebrow}
+              </span>
+              <h3 className="font-display font-bold text-2xl md:text-[34px] leading-[1.1] tracking-tight m-0">
+                {card.title?.split(/(?<=\.) /).map((line, i, lines) => (
+                  <Fragment key={i}>
+                    {line}
+                    {i < lines.length - 1 && <br />}
+                  </Fragment>
+                ))}
+              </h3>
+              <div className="flex flex-wrap gap-2.5">
+                {card.pills?.map((pill) => (
+                  <span
+                    key={pill}
+                    className="font-mono text-[10px] tracking-[0.1em] uppercase border border-neutral-content/25 rounded-full px-3.5 py-2"
+                  >
+                    {pill}
+                  </span>
+                ))}
               </div>
-            ) : (
+            </div>
+          ))}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {BENTO.filter((card) => card.kind === "light").map((card, index) => (
               <div
                 key={index}
                 className="min-w-0 bg-white border border-base-300 rounded-[28px] p-6 flex flex-col gap-3.5"
@@ -318,8 +326,8 @@ export default function Home() {
                 <h3 className="font-display font-semibold text-lg m-0">{card.title}</h3>
                 <p className="text-sm leading-relaxed text-base-content/70 m-0">{card.desc}</p>
               </div>
-            )
-          )}
+            ))}
+          </div>
         </div>
       </section>
 
