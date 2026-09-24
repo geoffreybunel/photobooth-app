@@ -16,9 +16,6 @@ export default function Navbar() {
           <Link href="/#filters" className="text-base-content/70 hover:text-primary">
             Filters
           </Link>
-          <Link href="/#about" className="text-base-content/70 hover:text-primary">
-            About
-          </Link>
         </div>
 
         <Link

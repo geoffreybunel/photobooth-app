@@ -10,14 +10,14 @@ const SOCIALS = [
     label: "GitHub",
     value: "@geoffreybunel",
     href: "https://github.com/geoffreybunel",
-    hint: "Code, issues, and what I'm building.",
+    // hint: "Code, issues, and what I'm building.",
   },
   {
     dot: "bg-accent",
     label: "LinkedIn",
     value: "Geoffrey Bunel",
     href: "https://www.linkedin.com/in/geoffrey-bunel/",
-    hint: "For work, not memes.",
+    // hint: "For work, not memes.",
   },
 ];
 
@@ -196,7 +196,7 @@ export default function ContactForm() {
                 {channel.label}
               </p>
               <p className="font-display font-semibold text-base">{channel.value}</p>
-              <p className="text-sm leading-relaxed text-base-content/70">{channel.hint}</p>
+              {/* <p className="text-sm leading-relaxed text-base-content/70">{channel.hint}</p> */}
             </div>
           </a>
         ))}
