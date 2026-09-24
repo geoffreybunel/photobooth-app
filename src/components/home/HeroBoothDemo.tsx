@@ -62,16 +62,15 @@ export default function HeroBoothDemo() {
           className="absolute -top-2.5 left-1/2 w-11 h-[19px] rounded-sm bg-secondary/90"
           style={{ transform: "translateX(-50%) rotate(-6deg)" }}
         />
-        {FILTERS.slice(0, 4).map((f, index) => (
-          <span key={f.id} className="relative block w-full aspect-square rounded-[2px] overflow-hidden">
+        {DEMO_PHOTOS.map((photo) => (
+          <span key={photo} className="relative block w-full aspect-square rounded-[2px] overflow-hidden">
             <Image
-              src={DEMO_PHOTOS[index]}
+              src={photo}
               alt=""
               fill
               sizes="160px"
               quality={90}
               className="object-cover object-[35%_center]"
-              style={{ filter: f.css }}
             />
           </span>
         ))}

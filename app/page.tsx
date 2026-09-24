@@ -80,13 +80,13 @@ const BENTO = [
   },
 ];
 
-const MARQUEE_PHOTOS = ["/photobooth-pinup.jpg", "/filter-preview-camera.jpg"];
+const MARQUEE_PHOTOS = ["/Booth-1.jpg", "/Booth-2.jpg", "/Couple-taking-picture.jpg", "/filter-preview-camera.jpg", "/Group-1.1.jpg", "/Group-2.1.jpg"];
 const MARQUEE_TILES = [0, 1].flatMap((round) =>
   FILTERS.flatMap((filter) =>
     MARQUEE_PHOTOS.map((photo) => ({
       key: `${round}-${photo}-${filter.id}`,
       photo,
-      css: filter.css,
+      // css: filter.css,
     }))
   )
 );
@@ -183,7 +183,7 @@ export default function Home() {
                 fill
                 sizes="110px"
                 className="object-cover"
-                style={{ filter: tile.css }}
+                // style={{ filter: tile.css }}
               />
             </div>
           ))}
@@ -204,13 +204,10 @@ export default function Home() {
             <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-primary">
               How it works
             </span>
-            <h2 className="font-display font-bold text-3xl md:text-[44px] leading-[1.06] tracking-tight text-balance m-0 max-w-[520px]">
+            <h2 className="font-display font-bold text-3xl md:text-[44px] leading-[1.06] tracking-tight text-balance m-0">
               Three taps from curious to printed.
             </h2>
           </div>
-          <p className="text-[15px] leading-relaxed text-base-content/70 max-w-[300px] m-0">
-            Everything happens in your browser. Your camera feed never leaves the device.
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -238,7 +235,7 @@ export default function Home() {
             <span className="font-mono text-[11px] tracking-[0.16em] uppercase text-primary">
               Filters
             </span>
-            <h2 className="font-display font-bold text-3xl md:text-[44px] leading-[1.06] tracking-tight text-balance m-0 max-w-[520px]">
+            <h2 className="font-display font-bold text-3xl md:text-[44px] leading-[1.06] tracking-tight text-balance m-0">
               Four looks, no wrong answer.
             </h2>
           </div>
